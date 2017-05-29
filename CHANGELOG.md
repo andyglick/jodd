@@ -2,10 +2,15 @@
 
 All notable changes to Jodd project are documented here.
 
-## [Unreleased](https://github.com/oblac/jodd/compare/v3.8.5...master)
+## [Unreleased](https://github.com/oblac/jodd/compare/v3.8.6...master)
+
+n/a
+
+## [3.8.6](https://github.com/oblac/jodd/compare/v3.8.5...3.8.6)
 
 ### Bug Fixes
 
++ **core** - fixes `downloadFile` to download bigger files as well.
 + **lagarto** - bug introduced in 3.8.5; bad parsing of pseudo-function arguments [#407](https://github.com/oblac/jodd/issues/407).
 
 ### Features
