@@ -25,20 +25,20 @@
 
 package jodd.util;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class NaturalOrderComparatorTest {
+class NaturalOrderComparatorTest {
 
 	@Test
-	public void testCaseSensitive() {
+	void testCaseSensitive() {
 		assertTrue("A".compareTo("a") < 0);
 		assertTrue(new NaturalOrderComparator<String>().compare("A", "a") < 0);
 
@@ -57,22 +57,22 @@ public class NaturalOrderComparatorTest {
 	}
 
 	@Test
-	public void testNatural202() {
+	void testNatural202() {
 		assertEquals(1, new NaturalOrderComparator<String>().compare("2-02", "2-2"));
 	}
 
 	@Test
-	public void testNaturalSig() {
+	void testNaturalSig() {
 		assertEquals(-1, new NaturalOrderComparator<String>().compare("sig[0]", "sig[1]"));
 	}
 
 	@Test
-	public void testNaturalSig00() {
+	void testNaturalSig00() {
 		assertTrue(new NaturalOrderComparator<String>().compare("sig[0]", "sig[00]") < 0);
 	}
 
 	@Test
-	public void testNaturalSignatureNumberAndNonNumber() {
+	void testNaturalSignatureNumberAndNonNumber() {
 		assertTrue(new NaturalOrderComparator<String>().compare("22", "A") < 0);
 		assertTrue(new NaturalOrderComparator<String>().compare("22", "!") > 0);
 
@@ -85,12 +85,12 @@ public class NaturalOrderComparatorTest {
 	 * the real order.
 	 */
 	@Test
-	public void testNaturalComparisonSpecialCase() {
+	void testNaturalComparisonSpecialCase() {
 		assertTrue(new NaturalOrderComparator<String>().compare("00.1", "0.2") < 0);
 	}
 
 	@Test
-	public void testNaturalOrder() {
+	void testNaturalOrder() {
 
 		String[] strings = new String[] {
 			"1.2.9.1",
@@ -174,7 +174,7 @@ public class NaturalOrderComparatorTest {
 	}
 
 	@Test
-	public void testNaturalComparatorCommons() {
+	void testNaturalComparatorCommons() {
 		NaturalOrderComparator<String> comparator = new NaturalOrderComparator<>();
 
 		assertTrue("image9.jpg".compareTo("image10.jpg") > 0);	// reference
@@ -192,7 +192,7 @@ public class NaturalOrderComparatorTest {
 	}
 
 	@Test
-	public void testNaturalComparatorWithZeros() {
+	void testNaturalComparatorWithZeros() {
 		NaturalOrderComparator<String> comparator = new NaturalOrderComparator<>();
 
 		assertTrue("0".compareTo("A") < 0);				// reference
@@ -241,15 +241,15 @@ public class NaturalOrderComparatorTest {
 	}
 
 	@Test
-	public void testNaturalComparatorContract() {
+	void testNaturalComparatorContract() {
 		NaturalOrderComparator<String> comparator = new NaturalOrderComparator<>();
 
 		int loop = 1000;
 
 		while(loop-- > 0) {
-			String s1 = RandomString.getInstance().randomAscii(2);
-			String s2 = RandomString.getInstance().randomAscii(5);
-			String s3 = RandomString.getInstance().randomAscii(4);
+			String s1 = RandomString.get().randomAscii(2);
+			String s2 = RandomString.get().randomAscii(5);
+			String s3 = RandomString.get().randomAscii(4);
 
 			assertReflexivity(comparator, s1, s2);
 			assertTransitivity(comparator, s1, s2, s3);
@@ -257,15 +257,15 @@ public class NaturalOrderComparatorTest {
 	}
 
 	@Test
-	public void testNaturalComparatorContract2() {
+	void testNaturalComparatorContract2() {
 		NaturalOrderComparator<String> comparator = new NaturalOrderComparator<>();
 
 		int loop = 1000;
 
 		while(loop-- > 0) {
-			String s1 = RandomString.getInstance().randomNumeric(2);
-			String s2 = RandomString.getInstance().randomNumeric(5);
-			String s3 = RandomString.getInstance().randomNumeric(4);
+			String s1 = RandomString.get().randomNumeric(2);
+			String s2 = RandomString.get().randomNumeric(5);
+			String s3 = RandomString.get().randomNumeric(4);
 
 			assertReflexivity(comparator, s1, s2);
 			assertTransitivity(comparator, s1, s2, s3);
@@ -273,7 +273,7 @@ public class NaturalOrderComparatorTest {
 	}
 
 	@Test
-	public void testNaturalComparatorContractCase1() {
+	void testNaturalComparatorContractCase1() {
 		NaturalOrderComparator<String> comparator = new NaturalOrderComparator<>();
 
 		String s1 = "0N";
@@ -289,7 +289,7 @@ public class NaturalOrderComparatorTest {
 	}
 
 	@Test
-	public void testNaturalComparatorContractCase2() {
+	void testNaturalComparatorContractCase2() {
 		NaturalOrderComparator<String> comparator = new NaturalOrderComparator<>();
 
 		String s1 = "22";
@@ -305,7 +305,7 @@ public class NaturalOrderComparatorTest {
 	}
 
 	@Test
-	public void testNaturalIgnoringLeadingSpaces() {
+	void testNaturalIgnoringLeadingSpaces() {
 		String[] list = new String[] {
 			"  ignore leading spaces: 2+0",
 			"   ignore leading spaces: 2+1",
@@ -317,7 +317,7 @@ public class NaturalOrderComparatorTest {
 	}
 
 	@Test
-	public void testNaturalIgnoreMultipleAdjacentSpaces() {
+	void testNaturalIgnoreMultipleAdjacentSpaces() {
 		String[] list = new String[] {
 			"ignore m.a.s   spaces: 2+0",
 			"ignore m.a.s    spaces: 2+1",
@@ -329,7 +329,7 @@ public class NaturalOrderComparatorTest {
 	}
 
 	@Test
-	public void testNaturalAccents() {
+	void testNaturalAccents() {
 		String[] list = new String[] {
 			"above",
 			"Æon",
@@ -372,13 +372,13 @@ public class NaturalOrderComparatorTest {
 		String input = "\ns1: " + s1 + "\ns2: " + s2 + "\ns3: " + s3;
 
 		if (c12 > 0 && c23 > 0) {
-			assertTrue(input,  c13 > 0);
+			assertTrue(c13 > 0, input);
 		}
 		else if (c12 < 0 && c23 < 0) {
-			assertTrue(input, c13 < 0);
+			assertTrue(c13 < 0, input);
 		}
 		else if (c12 == 0 & c23 == 0) {
-			assertTrue(input, c13 == 0);
+			assertTrue(c13 == 0, input);
 		}
 	}
 }

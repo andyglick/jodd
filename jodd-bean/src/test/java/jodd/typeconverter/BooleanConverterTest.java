@@ -26,24 +26,24 @@
 package jodd.typeconverter;
 
 import jodd.typeconverter.impl.BooleanConverter;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class BooleanConverterTest {
+class BooleanConverterTest {
 
 	private static BooleanConverter booleanConverter;
 
-	@Before
-	public void setUp(){
+	@BeforeEach
+	void setUp(){
 		booleanConverter = new BooleanConverter();
 	}
 
-
 	@Test
-	public void testConversion() {
+	void testConversion() {
 		assertNull(booleanConverter.convert(null));
 
 		assertEquals(Boolean.TRUE, booleanConverter.convert(Boolean.TRUE));
@@ -68,14 +68,14 @@ public class BooleanConverterTest {
 		assertEquals(Boolean.FALSE, booleanConverter.convert(""));
 	}
 
-	@Test(expected = TypeConversionException.class)
-	public void testConversionWithBlankInput() {
-		booleanConverter.convert("    ");
+	@Test
+	void testConversionWithBlankInput() {
+		assertThrows(TypeConversionException.class, () -> booleanConverter.convert("    "));
 	}
 
-	@Test(expected = TypeConversionException.class)
-	public void testConversionWithUnrecognizedInput() {
-		booleanConverter.convert("asd#%^&(412");
+	@Test
+	void testConversionWithUnrecognizedInput() {
+		assertThrows(TypeConversionException.class, () -> booleanConverter.convert("asd#%^&(412"));
 	}
 
 }

@@ -25,21 +25,21 @@
 
 package jodd.io;
 
+import jodd.system.SystemUtil;
 import jodd.util.StringUtil;
-import jodd.util.SystemUtil;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SuppressWarnings({"SimplifiableJUnitAssertion"})
-public class FileNameUtilTest {
+class FileNameUtilTest {
 
 	@Test
-	public void testPrefixLength() {
+	void testPrefixLength() {
 		assertEquals(0, FileNameUtil.getPrefixLength("a\\b\\c.txt"));
 		assertEquals(1, FileNameUtil.getPrefixLength("\\a\\b\\c.txt"));
 		assertEquals(2, FileNameUtil.getPrefixLength("C:a\\b\\c.txt"));
@@ -59,7 +59,7 @@ public class FileNameUtilTest {
 	}
 
 	@Test
-	public void testNormalizeProblem() {
+	void testNormalizeProblem() {
 		assertEquals("//foo/bar", FileNameUtil.normalize("//foo/.///bar", true));
 		assertEquals("/bar", FileNameUtil.normalize("/./bar", true));
 		assertEquals("//foo//", FileNameUtil.normalize("//foo//", true));
@@ -68,7 +68,7 @@ public class FileNameUtilTest {
 	}
 
 	@Test
-	public void testNormalize() {
+	void testNormalize() {
 		assertEquals("/foo/", FileNameUtil.normalize("/foo//", true));
 		assertEquals("/foo/", FileNameUtil.normalize("/foo/./", true));
 		assertEquals("/bar", FileNameUtil.normalize("/foo/../bar", true));
@@ -91,7 +91,7 @@ public class FileNameUtilTest {
 	}
 
 	@Test
-	public void testNormalizeNoEndSeparator() {
+	void testNormalizeNoEndSeparator() {
 		assertEquals("/foo", FileNameUtil.normalizeNoEndSeparator("/foo//", true));
 		assertEquals("/foo", FileNameUtil.normalizeNoEndSeparator("/foo/./", true));
 		assertEquals("/bar", FileNameUtil.normalizeNoEndSeparator("/foo/../bar", true));
@@ -113,7 +113,7 @@ public class FileNameUtilTest {
 	}
 
 	@Test
-	public void testConcat() {
+	void testConcat() {
 		assertEquals("/foo/bar", FileNameUtil.concat("/foo/", "bar", true));
 		assertEquals("\\foo\\bar", FileNameUtil.concat("/foo/", "bar", false));
 		assertEquals("/foo/bar", FileNameUtil.concat("/foo", "bar", true));
@@ -129,14 +129,14 @@ public class FileNameUtilTest {
 	}
 
 	@Test
-	public void testGetPathNoEndSeparator() {
+	void testGetPathNoEndSeparator() {
 		assertEquals("", FileNameUtil.getPathNoEndSeparator("/hello.world.html"));
 		assertEquals("foo", FileNameUtil.getPathNoEndSeparator("/foo/hello.world.html"));
 		assertEquals("foo/bar", FileNameUtil.getPathNoEndSeparator("/foo/bar/hello.world.html"));
 	}
 
 	@Test
-	public void testExtension() {
+	void testExtension() {
 		assertEquals("foo", FileNameUtil.getExtension("/a/b/c.foo"));
 		assertEquals("doo", FileNameUtil.getExtension("/a/b/c.foo.doo"));
 		assertEquals("", FileNameUtil.getExtension("/a/b/c"));
@@ -147,16 +147,16 @@ public class FileNameUtilTest {
 	}
 
 	@Test
-	public void testResolveHome() {
+	void testResolveHome() {
 		assertEquals("qwe", FileNameUtil.resolveHome("qwe"));
 		assertEquals("", FileNameUtil.resolveHome(""));
-		assertEquals(SystemUtil.userHome(), FileNameUtil.resolveHome("~"));
-		assertEquals(fixpath(SystemUtil.userHome() + "/"), FileNameUtil.resolveHome(fixpath("~/")));
-		assertEquals(fixpath(SystemUtil.userHome() + "/foo"), FileNameUtil.resolveHome(fixpath("~/foo")));
+		assertEquals(SystemUtil.info().getHomeDir(), FileNameUtil.resolveHome("~"));
+		assertEquals(fixpath(SystemUtil.info().getHomeDir() + "/"), FileNameUtil.resolveHome(fixpath("~/")));
+		assertEquals(fixpath(SystemUtil.info().getHomeDir() + "/foo"), FileNameUtil.resolveHome(fixpath("~/foo")));
 	}
 
 	@Test
-	public void testGetRelativePaths() {
+	void testGetRelativePaths() {
 		assertEquals(fixpath("../../b/c"), FileNameUtil.relativePath("/a/b/c", "/a/x/y/"));
 		assertEquals(fixpath("../../b/c"), FileNameUtil.relativePath("/m/n/o/a/b/c", "/m/n/o/a/x/y/"));
 		assertEquals(fixpath("stuff/xyz.dat"), FileNameUtil.relativePath("/var/data/stuff/xyz.dat", "/var/data/"));

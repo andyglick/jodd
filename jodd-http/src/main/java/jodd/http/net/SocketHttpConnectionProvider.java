@@ -25,10 +25,9 @@
 
 package jodd.http.net;
 
-import jodd.http.HttpException;
-import jodd.http.JoddHttp;
 import jodd.http.HttpConnection;
 import jodd.http.HttpConnectionProvider;
+import jodd.http.HttpException;
 import jodd.http.HttpRequest;
 import jodd.http.ProxyInfo;
 import jodd.util.StringUtil;
@@ -50,13 +49,22 @@ import java.security.NoSuchAlgorithmException;
 public class SocketHttpConnectionProvider implements HttpConnectionProvider {
 
 	protected ProxyInfo proxy = ProxyInfo.directProxy();
+	protected String secureEnabledProtocols = System.getProperty("https.protocols");
 
 	/**
 	 * Defines proxy to use for created sockets.
 	 */
 	@Override
-	public void useProxy(ProxyInfo proxyInfo) {
+	public void useProxy(final ProxyInfo proxyInfo) {
 		proxy = proxyInfo;
+	}
+
+	/**
+	 * CSV of default enabled secured protocols. By default the value is
+	 * read from system property <code>https.protocols</code>.
+	 */
+	public void setSecuredProtocols(final String secureEnabledProtocols) {
+		this.secureEnabledProtocols = secureEnabledProtocols;
 	}
 
 	/**
@@ -64,7 +72,8 @@ public class SocketHttpConnectionProvider implements HttpConnectionProvider {
 	 *
 	 * @see #createSocket(String, int, int)
 	 */
-	public HttpConnection createHttpConnection(HttpRequest httpRequest) throws IOException {
+	@Override
+	public HttpConnection createHttpConnection(final HttpRequest httpRequest) throws IOException {
 		SocketHttpConnection httpConnection;
 
 		final boolean https = httpRequest.protocol().equalsIgnoreCase("https");
@@ -107,7 +116,7 @@ public class SocketHttpConnectionProvider implements HttpConnectionProvider {
 	/**
 	 * Creates a socket using socket factory.
 	 */
-	protected Socket createSocket(String host, int port, int connectionTimeout) throws IOException {
+	protected Socket createSocket(final String host, final int port, final int connectionTimeout) throws IOException {
 		SocketFactory socketFactory = getSocketFactory(proxy, false, false);
 
 		if (connectionTimeout < 0) {
@@ -127,8 +136,8 @@ public class SocketHttpConnectionProvider implements HttpConnectionProvider {
 	 * Creates a SSL socket. Enables default secure enabled protocols if specified.
 	 */
 	protected SSLSocket createSSLSocket(
-			String host, int port, int connectionTimeout,
-			boolean trustAll, boolean verifyHttpsHost) throws IOException {
+		final String host, final int port, final int connectionTimeout,
+		final boolean trustAll, final boolean verifyHttpsHost) throws IOException {
 
 		SocketFactory socketFactory = getSocketFactory(proxy, true, trustAll);
 
@@ -179,10 +188,8 @@ public class SocketHttpConnectionProvider implements HttpConnectionProvider {
 
 		// sslSocket is now ready
 
-		String enabledProtocols = JoddHttp.defaultSecureEnabledProtocols;
-
-		if (enabledProtocols != null) {
-			String[] values = StringUtil.splitc(enabledProtocols, ',');
+		if (secureEnabledProtocols != null) {
+			final String[] values = StringUtil.splitc(secureEnabledProtocols, ',');
 
 			StringUtil.trimAll(values);
 
@@ -192,7 +199,7 @@ public class SocketHttpConnectionProvider implements HttpConnectionProvider {
 		// set SSL parameters to allow host name verifier
 
 		if (verifyHttpsHost) {
-			SSLParameters sslParams = new SSLParameters();
+			final SSLParameters sslParams = new SSLParameters();
 
 			sslParams.setEndpointIdentificationAlgorithm("HTTPS");
 
@@ -205,7 +212,7 @@ public class SocketHttpConnectionProvider implements HttpConnectionProvider {
 	/**
 	 * Returns default SSL socket factory allowing setting trust managers.
 	 */
-	protected SSLSocketFactory getDefaultSSLSocketFactory(boolean trustAllCertificates) throws IOException {
+	protected SSLSocketFactory getDefaultSSLSocketFactory(final boolean trustAllCertificates) throws IOException {
 		if (trustAllCertificates) {
 			try {
 				SSLContext sc = SSLContext.getInstance("SSL");
@@ -223,7 +230,7 @@ public class SocketHttpConnectionProvider implements HttpConnectionProvider {
 	/**
 	 * Returns socket factory based on proxy type and SSL requirements.
 	 */
-	protected SocketFactory getSocketFactory(ProxyInfo proxy, boolean ssl, boolean trustAllCertificates) throws IOException {
+	protected SocketFactory getSocketFactory(final ProxyInfo proxy, final boolean ssl, final boolean trustAllCertificates) throws IOException {
 		switch (proxy.getProxyType()) {
 			case NONE:
 				if (ssl) {

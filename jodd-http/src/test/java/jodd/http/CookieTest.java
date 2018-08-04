@@ -25,15 +25,15 @@
 
 package jodd.http;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class CookieTest {
+class CookieTest {
 
 	@Test
-	public void testCookieParsing() {
+	void testCookieParsing() {
 		Cookie cookie = new Cookie("name=value");
 
 		assertEquals("name", cookie.getName());
@@ -56,7 +56,7 @@ public class CookieTest {
 	}
 
 	@Test
-	public void test395() {
+	void test395() {
 		Cookie cookie = new Cookie("name=value;");
 
 		assertEquals("name", cookie.getName());
@@ -74,7 +74,7 @@ public class CookieTest {
 	}
 
 	@Test
-	public void testSpecialCookieValues() {
+	void testSpecialCookieValues() {
 		Cookie cookie = new Cookie("name=value");
 
 		assertEquals("name", cookie.getName());

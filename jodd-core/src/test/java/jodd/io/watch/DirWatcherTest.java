@@ -27,23 +27,23 @@ package jodd.io.watch;
 
 import jodd.io.FileUtil;
 import jodd.util.ThreadUtil;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Ignore("test does not give consistent results - run each method individually")
-public class DirWatcherTest {
+@Disabled("test does not give consistent results - run each method individually")
+class DirWatcherTest {
 
 	protected String dataRoot;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		if (dataRoot != null) {
 			return;
 		}
@@ -52,7 +52,7 @@ public class DirWatcherTest {
 	}
 
 	@Test
-	public void testDirWatcher() throws IOException {
+	void testDirWatcher() throws IOException {
 		DirWatcher dirWatcher = new DirWatcher(dataRoot, "*.md");
 
 		final StringBuilder sb = new StringBuilder();
@@ -82,7 +82,7 @@ public class DirWatcherTest {
 	}
 
 	@Test
-	public void testDirWatcherWithFile() throws IOException {
+	void testDirWatcherWithFile() throws IOException {
 		DirWatcher dirWatcher = new DirWatcher(dataRoot)
 				.monitor("*.md")
 				.useWatchFile("watch.txt");
@@ -118,7 +118,7 @@ public class DirWatcherTest {
 	}
 
 	@Test
-	public void testBlankStart() throws IOException {
+	void testBlankStart() throws IOException {
 		DirWatcher dirWatcher = new DirWatcher(dataRoot)
 				.monitor("*.txt")
 				.startBlank(true);

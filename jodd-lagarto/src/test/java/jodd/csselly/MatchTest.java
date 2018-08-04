@@ -25,17 +25,17 @@
 
 package jodd.csselly;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import jodd.csselly.selector.Match;
 
-public class MatchTest {
+class MatchTest {
 
 	@Test
-	public void testIncludes() {
+	void testIncludes() {
 		boolean result = Match.INCLUDES.compare("toto", "toto");
         assertTrue(result);
         

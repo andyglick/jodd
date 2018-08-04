@@ -1,40 +1,61 @@
+// Copyright (c) 2003-present, Jodd Team (http://jodd.org)
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+// 1. Redistributions of source code must retain the above copyright notice,
+// this list of conditions and the following disclaimer.
+//
+// 2. Redistributions in binary form must reproduce the above copyright
+// notice, this list of conditions and the following disclaimer in the
+// documentation and/or other materials provided with the distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 package jodd.log.impl;
 
 import jodd.log.Logger;
 import jodd.log.impl.fixtures.LoggerConstants;
 import org.apache.logging.log4j.Level;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.when;
 
-public class Log4j2LoggerTest extends LoggerTestBase {
+class Log4j2LoggerTest extends LoggerTestBase {
 
 	private org.apache.logging.log4j.Logger log;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		log = mock(org.apache.logging.log4j.Logger.class);
 		logger = new Log4j2Logger(log);
 	}
 
 	@Test
-	public void testGetName() {
+	void testGetName() {
 		//given
 		when(log.getName()).thenReturn(LoggerConstants.LOG);
 
 		//then
-		assertEquals("Name must be equal log as we set log to the logger", LoggerConstants.LOG, logger.getName());
+		assertEquals(logger.getName(), LoggerConstants.LOG);
 	}
 
 	@Test
-	public void testLog() {
+	void testLog() {
 		//when
 		logger.log(Logger.Level.TRACE, LoggerConstants.SIMPLE_MESSAGE);
 
@@ -67,7 +88,7 @@ public class Log4j2LoggerTest extends LoggerTestBase {
 	}
 
 	@Test
-	public void testLevel() {
+	void testLevel() {
 		//when
 		logger.trace(LoggerConstants.TRACE_MESSAGE);
 
@@ -100,7 +121,7 @@ public class Log4j2LoggerTest extends LoggerTestBase {
 	}
 
 	@Test
-	public void testErrorWithThrowable() {
+	void testErrorWithThrowable() {
 		//given
 		throwable = mock(Throwable.class);
 
@@ -112,7 +133,7 @@ public class Log4j2LoggerTest extends LoggerTestBase {
 	}
 
 	@Test
-	public void testWarnWithThrowable() {
+	void testWarnWithThrowable() {
 		//given
 		throwable = mock(Throwable.class);
 
@@ -124,7 +145,7 @@ public class Log4j2LoggerTest extends LoggerTestBase {
 	}
 
 	@Test
-	public void testLog4j2LoggerFactory() {
+	void testLog4j2LoggerFactory() {
 		//given
 		loggerProvider = Log4j2Logger.PROVIDER;
 
@@ -132,7 +153,6 @@ public class Log4j2LoggerTest extends LoggerTestBase {
 		logger = loggerProvider.createLogger(LoggerConstants.LOGGER);
 
 		//then
-		assertThat("Logger must be of type Log4j2Logger", logger.getClass(),
-			is(instanceOf(Log4j2Logger.class.getClass())));
+		assertEquals(Log4j2Logger.class, logger.getClass());
 	}
 }

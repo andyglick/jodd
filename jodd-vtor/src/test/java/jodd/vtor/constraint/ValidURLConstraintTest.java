@@ -25,13 +25,13 @@
 
 package jodd.vtor.constraint;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 // see: https://mathiasbynens.be/demo/url-regex
-public class ValidURLConstraintTest {
+class ValidURLConstraintTest {
 
 	public static boolean check(String url) {
 		return ValidURLConstraint.validate(url);
@@ -118,16 +118,15 @@ public class ValidURLConstraintTest {
 	};
 
 	@Test
-	public void testValidUrls() {
+	void testValidUrls() {
 		for (String url : SHOULD_MATCH) {
 			assertTrue(check(url));
 		}
 	}
 
 	@Test
-	public void testInvalidUrls() {
+	void testInvalidUrls() {
 		for (String url : SHOULD_NOT_MATCH) {
-			System.out.println(url);
 			assertFalse(check(url));
 		}
 	}

@@ -28,33 +28,30 @@ package jodd.log.impl;
 import jodd.log.Logger.Level;
 import jodd.log.impl.fixtures.LoggerConstants;
 import org.apache.commons.logging.Log;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.mock;
 
-public class JCLLoggerTest extends LoggerTestBase {
+class JCLLoggerTest extends LoggerTestBase {
 
 	private Log log;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		log = mock(Log.class);
 		logger = new JCLLogger(log);
 	}
 
 	@Test
-	public void testGetName() {
-		assertEquals(LoggerConstants.LOG, logger.getName());
+	void testGetName() {
+		assertEquals(log.toString(), logger.getName());
 	}
 
 	@Test
-	public void testLog() {
+	void testLog() {
 		//when
 		logger.log(Level.TRACE, LoggerConstants.SIMPLE_MESSAGE);
 
@@ -87,7 +84,7 @@ public class JCLLoggerTest extends LoggerTestBase {
 	}
 
 	@Test
-	public void testLevel() {
+	void testLevel() {
 		//when
 		logger.trace(LoggerConstants.TRACE_MESSAGE);
 
@@ -120,7 +117,7 @@ public class JCLLoggerTest extends LoggerTestBase {
 	}
 
 	@Test
-	public void testErrorWithThrowable() {
+	void testErrorWithThrowable() {
 		//given
 		throwable = mock(Throwable.class);
 
@@ -132,7 +129,7 @@ public class JCLLoggerTest extends LoggerTestBase {
 	}
 
 	@Test
-	public void testWarnWithThrowable() {
+	void testWarnWithThrowable() {
 		//given
 		throwable = mock(Throwable.class);
 
@@ -144,7 +141,7 @@ public class JCLLoggerTest extends LoggerTestBase {
 	}
 
 	@Test
-	public void testJCLLoggerFactory() {
+	void testJCLLoggerFactory() {
 		//given
 		loggerProvider = JCLLogger.PROVIDER;
 
@@ -152,7 +149,6 @@ public class JCLLoggerTest extends LoggerTestBase {
 		logger = loggerProvider.createLogger(LoggerConstants.LOGGER);
 
 		//then
-		assertThat("Logger must be of type JCLLogger", logger.getClass(),
-			is(instanceOf(JCLLogger.class.getClass())));
+		assertEquals(JCLLogger.class, logger.getClass());
 	}
 }

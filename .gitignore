@@ -2,8 +2,6 @@
 /dist/
 /out/
 *.iml
-*.ipr
-*.iws
 .idea
 /user.*
 .gradle

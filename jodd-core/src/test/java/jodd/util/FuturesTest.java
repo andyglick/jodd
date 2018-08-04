@@ -26,19 +26,19 @@
 package jodd.util;
 
 import jodd.mutable.MutableInteger;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
-public class FuturesTest {
+class FuturesTest {
 
 	@Test
-	public void testWithinBreaksAsyncExecution() throws ExecutionException, InterruptedException {
+	void testWithinBreaksAsyncExecution() throws ExecutionException, InterruptedException {
 		final CompletableFuture<String> asyncCode = CompletableFuture.supplyAsync(() -> {
 			ThreadUtil.sleep(3000);
 			return "done";
@@ -54,7 +54,7 @@ public class FuturesTest {
 	}
 
 	@Test
-	public void testWithinAsyncFaster() throws ExecutionException, InterruptedException {
+	void testWithinAsyncFaster() throws ExecutionException, InterruptedException {
 		final CompletableFuture<String> asyncCode = CompletableFuture.supplyAsync(() -> {
 			ThreadUtil.sleep(1000);
 			return "done";
@@ -65,12 +65,12 @@ public class FuturesTest {
 			.get();
 
 		if (value == null) {
-			fail();
+			fail("error");
 		}
 	}
 
 	@Test
-	public void testFailAfterOnManyTasks() throws ExecutionException, InterruptedException {
+	void testFailAfterOnManyTasks() throws ExecutionException, InterruptedException {
 		MutableInteger execCount = new MutableInteger();
 		MutableInteger interruptCount = new MutableInteger();
 

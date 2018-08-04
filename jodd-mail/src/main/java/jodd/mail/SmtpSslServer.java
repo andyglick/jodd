@@ -27,6 +27,7 @@ package jodd.mail;
 
 import jodd.util.StringPool;
 
+import javax.mail.Authenticator;
 import java.util.Properties;
 
 /**
@@ -34,75 +35,78 @@ import java.util.Properties;
  */
 public class SmtpSslServer extends SmtpServer<SmtpSslServer> {
 
-	public static final String MAIL_SMTP_STARTTLS_REQUIRED 		= "mail.smtp.starttls.required";
-	public static final String MAIL_SMTP_STARTTLS_ENABLE 		= "mail.smtp.starttls.enable";
-	public static final String MAIL_SMTP_SOCKET_FACTORY_PORT 	= "mail.smtp.socketFactory.port";
-	public static final String MAIL_SMTP_SOCKET_FACTORY_CLASS 	= "mail.smtp.socketFactory.class";
+	public static final String MAIL_SMTP_STARTTLS_REQUIRED = "mail.smtp.starttls.required";
+	public static final String MAIL_SMTP_STARTTLS_ENABLE = "mail.smtp.starttls.enable";
+	public static final String MAIL_SMTP_SOCKET_FACTORY_PORT = "mail.smtp.socketFactory.port";
+	public static final String MAIL_SMTP_SOCKET_FACTORY_CLASS = "mail.smtp.socketFactory.class";
 	public static final String MAIL_SMTP_SOCKET_FACTORY_FALLBACK = "mail.smtp.socketFactory.fallback";
 
+	/**
+	 * Default SMTP SSL port.
+	 */
 	protected static final int DEFAULT_SSL_PORT = 465;
 
-	public static SmtpSslServer create(String host) {
-		return new SmtpSslServer(host, DEFAULT_SSL_PORT);
-	}
-
-	public static SmtpSslServer create(String host, int port) {
-		return new SmtpSslServer(host, port);
-	}
-
-	public SmtpSslServer(String host) {
-		super(host, DEFAULT_SSL_PORT);
-	}
-
-	public SmtpSslServer(String host, int port) {
-		super(host, port);
+	public SmtpSslServer(final String host, final int port, final Authenticator authenticator) {
+		super(host, port == -1 ? DEFAULT_SSL_PORT : port, authenticator);
 	}
 
 	// ---------------------------------------------------------------- properties
 
+	/**
+	 * Defaults to {@code false}.
+	 */
 	protected boolean startTlsRequired = false;
-	protected boolean plaintextOverTLS = false;		// google requires it to be false
 
 	/**
-	 * Sets <code>mail.smtp.starttls.required</code> which according to
-	 * Java Mail API means: If true, requires the use of the STARTTLS command.
-	 * If the server doesn't support the STARTTLS command, or the command fails,
-	 * the connect method will fail. Defaults to <code>false</code>.
+	 * Defaults to {@code false}. Google requires it to be false
 	 */
-	public SmtpSslServer startTlsRequired(boolean startTlsRequired) {
+	protected boolean plaintextOverTLS = false;
+
+	/**
+	 * Sets <code>mail.smtp.starttls.required</code>.
+	 * <p>
+	 * If the server doesn't support the STARTTLS command, or the command fails,
+	 * the connect method will fail. Defaults to {@code false}.
+	 *
+	 * @param startTlsRequired If {@code true}, requires the use of the STARTTLS command.
+	 * @return this
+	 */
+	public SmtpSslServer startTlsRequired(final boolean startTlsRequired) {
 		this.startTlsRequired = startTlsRequired;
 		return this;
 	}
 
 	/**
-	 * When enabled, SMTP socket factory class will be not set,
+	 * When enabled, <code>MAIL_SMTP_SOCKET_FACTORY_CLASS</code> will be not set,
 	 * and Plaintext Authentication over TLS will be enabled.
+	 *
+	 * @param plaintextOverTLS {@code true} when plain text authentication over TLS should be enabled.
+	 * @return this
 	 */
-	public SmtpSslServer plaintextOverTLS(boolean plaintextOverTLS) {
+	public SmtpSslServer plaintextOverTLS(final boolean plaintextOverTLS) {
 		this.plaintextOverTLS = plaintextOverTLS;
 		return this;
 	}
 
-
 	@Override
 	protected Properties createSessionProperties() {
-		Properties props = super.createSessionProperties();
+		final Properties props = super.createSessionProperties();
 
 		props.setProperty(MAIL_SMTP_STARTTLS_REQUIRED,
 			startTlsRequired ? StringPool.TRUE : StringPool.FALSE);
 
 		props.setProperty(MAIL_SMTP_STARTTLS_ENABLE, StringPool.TRUE);
 
-		props.setProperty(MAIL_SMTP_SOCKET_FACTORY_PORT, String.valueOf(port));
+		props.setProperty(MAIL_SMTP_SOCKET_FACTORY_PORT, String.valueOf(getPort()));
 
-		props.setProperty(MAIL_SMTP_PORT, String.valueOf(port));
+		props.setProperty(MAIL_SMTP_PORT, String.valueOf(getPort()));
 
 		if (!plaintextOverTLS) {
 			props.setProperty(MAIL_SMTP_SOCKET_FACTORY_CLASS, "javax.net.ssl.SSLSocketFactory");
 		}
 
 		props.setProperty(MAIL_SMTP_SOCKET_FACTORY_FALLBACK, StringPool.FALSE);
-		props.setProperty(MAIL_HOST, host);
+		props.setProperty(MAIL_HOST, getHost());
 
 		return props;
 	}

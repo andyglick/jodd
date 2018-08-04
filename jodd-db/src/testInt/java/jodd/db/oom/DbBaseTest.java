@@ -25,8 +25,7 @@
 
 package jodd.db.oom;
 
-import jodd.db.DbDetector;
-import jodd.db.DbManager;
+import jodd.db.DbOom;
 import jodd.db.DbQuery;
 import jodd.db.DbSession;
 import jodd.db.pool.CoreConnectionPool;
@@ -34,19 +33,26 @@ import jodd.exception.UncheckedException;
 import jodd.log.LoggerFactory;
 import jodd.log.impl.NOPLogger;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Abstract common DB integration test class.
  */
 public abstract class DbBaseTest {
 
-	public static final String DB_NAME = "jodd-test";
+	public static final String DB_NAME = "jodd_test";
 
 	protected CoreConnectionPool connectionPool;
-	protected DbOomManager dboom;
+	protected DbOom dbOom;
 
-	protected void init() {
+	protected void init(DbAccess db) {
+		initDbOom();
+		db.initConnectionPool(connectionPool);
+		dbOom.connect();
+		db.configureAfterConnection();
+	}
+
+	private void initDbOom() {
 		LoggerFactory.setLoggerProvider(name -> new NOPLogger("") {
 			@Override
 			public boolean isWarnEnabled() {
@@ -54,40 +60,30 @@ public abstract class DbBaseTest {
 			}
 
 			@Override
-			public void warn(String message) {
+			public void warn(final String message) {
 				throw new UncheckedException("NO WARNINGS ALLOWED: " + message);
 			}
 
 			@Override
-			public void warn(String message, Throwable throwable) {
+			public void warn(final String message, final Throwable throwable) {
 				throw new UncheckedException("NO WARNINGS ALLOWED: " + message);
 			}
 		});
-		DbOomManager.resetAll();
-
-		dboom = DbOomManager.getInstance();
-
 		connectionPool = new CoreConnectionPool();
-	}
-
-	protected void connect() {
-		connectionPool.init();
-		DbManager.getInstance().setConnectionProvider(connectionPool);
+		dbOom = DbOom.create().withConnectionProvider(connectionPool).get();
 	}
 
 	// ---------------------------------------------------------------- dbaccess
 
 	public abstract class DbAccess {
-		public abstract void initDb();
-		public abstract String getCreateTableSql();
+		public abstract void initConnectionPool(CoreConnectionPool connectionPool);
+		public abstract String createTableSql();
 		public abstract String getTableName();
 
 		public final void createTables() {
-			DbSession session = new DbSession();
+			DbSession session = new DbSession(connectionPool);
 
-			String sql = getCreateTableSql();
-
-			DbQuery query = new DbQuery(session, sql);
+			DbQuery query = new DbQuery(DbOom.get(), session, createTableSql());
 			query.executeUpdate();
 
 			session.closeSession();
@@ -95,16 +91,19 @@ public abstract class DbBaseTest {
 		}
 
 		protected void close() {
-			DbSession session = new DbSession();
+			DbSession session = new DbSession(connectionPool);
 
-			DbQuery query = new DbQuery(session, "drop table " + getTableName());
+			DbQuery query = new DbQuery(DbOom.get(), session, "drop table " + getTableName());
 			query.executeUpdate();
 
 			session.closeSession();
 			assertTrue(query.isClosed());
 
+			DbOom.get().shutdown();
 			connectionPool.close();
 		}
+
+		public void configureAfterConnection() {}
 	}
 
 	public static String dbhost() {
@@ -116,27 +115,18 @@ public abstract class DbBaseTest {
 	 */
 	public abstract class MySqlDbAccess extends DbAccess {
 
-		public final void initDb() {
+		@Override
+		public final void initConnectionPool(final CoreConnectionPool connectionPool) {
 			connectionPool.setDriver("com.mysql.jdbc.Driver");
-			connectionPool.setUrl("jdbc:mysql://" + dbhost() + ":3306");
+			connectionPool.setUrl("jdbc:mysql://" + dbhost() + ":3306/" + DB_NAME);
 			connectionPool.setUser("root");
 			connectionPool.setPassword("root!");
+		}
 
-			dboom.getTableNames().setUppercase(true);
-			dboom.getColumnNames().setUppercase(true);
-
-			//dboom.getTableNames().setLowercase(true);
-			//dboom.getColumnNames().setLowercase(true);
-
-			connectionPool.init();
-
-			DbSession session = new DbSession(connectionPool);
-			DbQuery query = new DbQuery(session, "create database IF NOT EXISTS `jodd-test` CHARACTER SET utf8 COLLATE utf8_general_ci;");
-			query.executeUpdate();
-			session.closeSession();
-
-			connectionPool.close();
-			connectionPool.setUrl("jdbc:mysql://" + dbhost() + ":3306/" + DB_NAME);
+		@Override
+		public void configureAfterConnection() {
+			DbOom.get().config().getTableNames().setUppercase(true);
+			DbOom.get().config().getColumnNames().setUppercase(true);
 		}
 	}
 
@@ -145,13 +135,26 @@ public abstract class DbBaseTest {
 	 */
 	public abstract class PostgreSqlDbAccess extends DbAccess {
 
-		public void initDb() {
+		@Override
+		public void initConnectionPool(final CoreConnectionPool connectionPool) {
 			connectionPool.setDriver("org.postgresql.Driver");
 			connectionPool.setUrl("jdbc:postgresql://" + dbhost() + "/" + DB_NAME);
 			connectionPool.setUser("postgres");
 			connectionPool.setPassword("root!");
+		}
+	}
 
-			DbDetector.detectDatabaseAndConfigureDbOom(connectionPool);
+	/**
+	 * MS SQL.
+	 */
+	public abstract class MsSqlDbAccess extends DbAccess {
+
+		@Override
+		public void initConnectionPool(final CoreConnectionPool connectionPool) {
+			connectionPool.setDriver("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+			connectionPool.setUrl("jdbc:sqlserver://" + dbhost() + ":1433;" + "databaseName=" + DB_NAME);
+			connectionPool.setUser("sa");
+			connectionPool.setPassword("root!R00t!");
 		}
 	}
 
@@ -160,16 +163,18 @@ public abstract class DbBaseTest {
 	 */
 	public abstract class HsqlDbAccess extends DbAccess {
 
-		public final void initDb() {
-			connectionPool = new CoreConnectionPool();
+		@Override
+		public final void initConnectionPool(final CoreConnectionPool connectionPool) {
 			connectionPool.setDriver("org.hsqldb.jdbcDriver");
 			connectionPool.setUrl("jdbc:hsqldb:mem:test");
 			connectionPool.setUser("sa");
 			connectionPool.setPassword("");
 
-			dboom.getTableNames().setUppercase(true);
-			dboom.getColumnNames().setUppercase(true);
+			DbOom.get().config().getTableNames().setUppercase(true);
+			DbOom.get().config().getColumnNames().setUppercase(true);
 		}
+
+
 	}
 
 }

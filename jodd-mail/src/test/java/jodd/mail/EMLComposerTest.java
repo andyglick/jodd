@@ -25,20 +25,22 @@
 
 package jodd.mail;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class EMLComposerTest {
+class EMLComposerTest {
+
+	private static final String HELLO = "Hello";
 
 	@Test
-	public void testWriteSimpleEmail() {
-		Email email = Email.create().from("Joe@example.com").to("Pig@example.com").addText("Hello");
+	void testWriteSimpleEmail() {
+		final Email email = Email.create().from("Joe@example.com").to("Pig@example.com").textMessage(HELLO);
 
-		String eml = EMLComposer.create().compose(email);
+		final String eml = EMLComposer.create().compose(email);
 
 		assertTrue(eml.contains("From: Joe@example.com\r\n"));
 		assertTrue(eml.contains("To: Pig@example.com\r\n"));
-		assertTrue(eml.contains("Hello"));
+		assertTrue(eml.contains(HELLO));
 	}
 }

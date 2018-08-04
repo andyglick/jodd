@@ -26,25 +26,29 @@
 package jodd.http;
 
 import jodd.util.StringPool;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class HttpUtilTest {
+class HttpUtilTest {
 
 	@Test
-	public void testNiceHeaderNames() {
+	void testNiceHeaderNames() {
 		assertEquals("Content-Type", HttpUtil.prepareHeaderParameterName("conTent-tyPe"));
 		assertEquals("ETag", HttpUtil.prepareHeaderParameterName("etag"));
 	}
 
 	@Test
-	public void testMediaTypeAndParameters() {
+	void testMediaTypeAndParameters() {
 		String contentType = "text/html";
 
 		assertEquals("text/html", HttpUtil.extractMediaType(contentType));
 		assertEquals(null, HttpUtil.extractHeaderParameter(contentType, "charset", ';'));
 
+		contentType = "text/html;"; // special case, see #588
+
+		assertEquals("text/html", HttpUtil.extractMediaType(contentType));
+		assertEquals(null, HttpUtil.extractHeaderParameter(contentType, "charset", ';'));
 
 		contentType = "text/html; charset=ISO-8859-4";
 
@@ -73,7 +77,7 @@ public class HttpUtilTest {
 	}
 
 	@Test
-	public void testDefaultPort() {
+	void testDefaultPort() {
 		HttpRequest request;
 
 		request = HttpRequest.get("jodd.org");
@@ -102,8 +106,8 @@ public class HttpUtilTest {
 	}
 
 	@Test
-	public void testBuildQuery() {
-		HttpMultiMap<String> map = HttpMultiMap.newCaseInsensitveMap();
+	void testBuildQuery() {
+		HttpMultiMap<String> map = HttpMultiMap.newCaseInsensitiveMap();
 
 		assertEquals("", HttpUtil.buildQuery(map, StringPool.UTF_8));
 

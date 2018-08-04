@@ -27,83 +27,84 @@ package jodd.http;
 
 import io.netty.handler.codec.http.HttpHeaders;
 import jodd.http.net.SocketHttpConnectionProvider;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mockserver.integration.ClientAndProxy;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.Header;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockserver.integration.ClientAndProxy.startClientAndProxy;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 import static org.mockserver.verify.VerificationTimes.exactly;
 
-public class ProxyTest {
+class ProxyTest {
 
 	private ClientAndProxy proxy;
 	private ClientAndServer mockServer;
 
-	@Before
-	public void startProxy() {
+	@BeforeEach
+	void startProxy() {
 		mockServer = startClientAndServer(1080);
 		proxy = startClientAndProxy(1090);
 		setupMockServer();
 	}
 
-	@After
-	public void stopProxy() {
+	@AfterEach
+	void stopProxy() {
 		proxy.stop();
 		mockServer.stop();
 	}
 
 	@Test
-	public void testDirect() {
+	void testDirect() {
 		HttpResponse response = HttpRequest.get("http://localhost:1080/get_books").send();
-		Assert.assertEquals(200, response.statusCode());
-		Assert.assertTrue(response.body().contains("Tatum"));
+		assertEquals(200, response.statusCode());
+		assertTrue(response.body().contains("Tatum"));
 		proxy.verify(request().withPath("/get_books"), exactly(0));
 	}
 
 	@Test
-	public void testDirectHttps() {
+	void testDirectHttps() {
 		HttpResponse response = HttpRequest.get("https://localhost:1080/get_books").trustAllCerts(true).send();
-		Assert.assertEquals(200, response.statusCode());
-		Assert.assertTrue(response.body().contains("Tatum"));
+		assertEquals(200, response.statusCode());
+		assertTrue(response.body().contains("Tatum"));
 		proxy.verify(request().withPath("/get_books"), exactly(0));
 	}
 
 	@Test
-	@Ignore
-	public void testHttpProxy() {
+	@Disabled
+	void testHttpProxy() {
 		SocketHttpConnectionProvider s = new SocketHttpConnectionProvider();
 		s.useProxy(ProxyInfo.httpProxy("localhost", 1090, null, null));
 
 		HttpResponse response = HttpRequest.get("http://localhost:1080/get_books")
 			.withConnectionProvider(s)
 			.send();
-		Assert.assertEquals(200, response.statusCode());
-		Assert.assertTrue(response.body().contains("Tatum"));
+		assertEquals(200, response.statusCode());
+		assertTrue(response.body().contains("Tatum"));
 	}
 
 	@Test
-	public void testSocks5Proxy() {
+	void testSocks5Proxy() {
 		SocketHttpConnectionProvider s = new SocketHttpConnectionProvider();
 		s.useProxy(ProxyInfo.socks5Proxy("localhost", 1090, null, null));
 
 		HttpResponse response = HttpRequest.get("http://localhost:1080/get_books")
 			.withConnectionProvider(s)
 			.send();
-		Assert.assertEquals(200, response.statusCode());
-		Assert.assertTrue(response.body().contains("Tatum"));
+		assertEquals(200, response.statusCode());
+		assertTrue(response.body().contains("Tatum"));
 		proxy.verify(request().withPath("/get_books"), exactly(1));
 	}
 
 	@Test
-	public void testSocks5ProxyWithHttps() {
+	void testSocks5ProxyWithHttps() {
 		SocketHttpConnectionProvider s = new SocketHttpConnectionProvider();
 		s.useProxy(ProxyInfo.socks5Proxy("localhost", 1090, null, null));
 
@@ -111,8 +112,8 @@ public class ProxyTest {
 			.withConnectionProvider(s)
 			.trustAllCerts(true)
 			.send();
-		Assert.assertEquals(200, response.statusCode());
-		Assert.assertTrue(response.body().contains("Tatum"));
+		assertEquals(200, response.statusCode());
+		assertTrue(response.body().contains("Tatum"));
 		proxy.verify(request().withPath("/get_books"), exactly(1));
 	}
 

@@ -25,16 +25,16 @@
 
 package jodd.htmlstapler;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static jodd.htmlstapler.HtmlStaplerBundlesManager.Strategy.RESOURCES_ONLY;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class HtmlStaplerBundlesManagerTest {
+class HtmlStaplerBundlesManagerTest {
 
 	@Test
-	public void testRandomDigest() {
+	void testRandomDigest() {
 		HtmlStaplerBundlesManager hsbm = new HtmlStaplerBundlesManager("/ctx", "/", RESOURCES_ONLY);
 
 		String digest = hsbm.createDigest("source");

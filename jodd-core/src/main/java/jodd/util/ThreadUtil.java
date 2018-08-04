@@ -25,11 +25,7 @@
 
 package jodd.util;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -42,7 +38,7 @@ public class ThreadUtil {
 	 *
 	 * @param ms     the length of time to sleep in milliseconds
 	 */
-	public static void sleep(long ms) {
+	public static void sleep(final long ms) {
 		try {
 			Thread.sleep(ms);
 		} catch (InterruptedException iex) {
@@ -68,7 +64,7 @@ public class ThreadUtil {
 	/**
 	 * Waits for a object for synchronization purposes.
 	 */
-	public static void wait(Object obj) {
+	public static void wait(final Object obj) {
 		synchronized (obj) {
 			try {
 				obj.wait();
@@ -81,7 +77,7 @@ public class ThreadUtil {
 	/**
 	 * Waits for a object or a timeout for synchronization purposes.
 	 */
-	public static void wait(Object obj, long timeout) {
+	public static void wait(final Object obj, final long timeout) {
 		synchronized (obj) {
 			try {
 				obj.wait(timeout);
@@ -94,7 +90,7 @@ public class ThreadUtil {
 	/**
 	 * Notifies an object for synchronization purposes.
 	 */
-	public static void notify(Object obj){
+	public static void notify(final Object obj){
 		synchronized (obj) {
 			obj.notify();
 		}
@@ -103,7 +99,7 @@ public class ThreadUtil {
 	/**
 	 * Notifies an object for synchronization purposes.
 	 */
-	public static void notifyAll(Object obj){
+	public static void notifyAll(final Object obj){
 		synchronized (obj) {
 			obj.notifyAll();
 		}
@@ -113,7 +109,7 @@ public class ThreadUtil {
 	// ---------------------------------------------------------------- join
 
 
-	public static void join(Thread thread) {
+	public static void join(final Thread thread) {
 		try {
 			thread.join();
 		} catch (InterruptedException inex) {
@@ -121,7 +117,7 @@ public class ThreadUtil {
 		}
 	}
 
-	public static void join(Thread thread, long millis) {
+	public static void join(final Thread thread, final long millis) {
 		try {
 			thread.join(millis);
 		} catch (InterruptedException inex) {
@@ -129,7 +125,7 @@ public class ThreadUtil {
 		}
 	}
 
-	public static void join(Thread thread, long millis, int nanos) {
+	public static void join(final Thread thread, final long millis, final int nanos) {
 		try {
 			thread.join(millis, nanos);
 		} catch (InterruptedException inex) {
@@ -143,18 +139,18 @@ public class ThreadUtil {
 	/**
 	 * Creates new daemon thread factory.
 	 */
-	public static ThreadFactory daemonThreadFactory(String name) {
+	public static ThreadFactory daemonThreadFactory(final String name) {
 		return daemonThreadFactory(name, Thread.NORM_PRIORITY);
 	}
 	/**
 	 * Creates new daemon thread factory.
 	 */
-	public static ThreadFactory daemonThreadFactory(String name, int priority) {
+	public static ThreadFactory daemonThreadFactory(final String name, final int priority) {
 		return new ThreadFactory() {
 			private AtomicInteger count = new AtomicInteger();
 
 			@Override
-			public Thread newThread(Runnable r) {
+			public Thread newThread(final Runnable r) {
 				Thread thread = new Thread(r);
 				thread.setName(name + '-' + count.incrementAndGet());
 				thread.setDaemon(true);
@@ -162,44 +158,6 @@ public class ThreadUtil {
 				return thread;
 			}
 		};
-	}
-
-	/**
-	 * Creates new core thread pool.
-	 * @see #newCoreThreadPool(String, int, int, int)
-	 */
-	public static ExecutorService newCoreThreadPool(String name) {
-		final int cpus = Runtime.getRuntime().availableProcessors();
-		return newCoreThreadPool(name, 5 * cpus, 15 * cpus, 60);
-	}
-
-	/**
-	 * Creates core thread pool. Uses direct hand-off (<code>SynchronousQueue</code>)
-	 * and <code>CallerRunsPolicy</code> to avoid deadlocks since tasks may have
-	 * internal dependencies.
-	 * <p>
-	 * <code>Executors.newCachedThreadPool()</code> isn't a great choice for server
-	 * code that's servicing multiple clients and concurrent requests.
-	 * 1) It's unbounded, and 2) The unbounded problem is exacerbated by the fact that
-	 * the Executor is fronted by a SynchronousQueue which means there's a direct
-	 * handoff between the task-giver and the thread pool. Each new task will create
-	 * a new thread if all existing threads are busy. This is generally a bad strategy
-	 * for server code. When the CPU gets saturated, existing tasks take longer to finish.
-	 * Yet more tasks are being submitted and more threads created, so tasks take longer and
-	 * longer to complete. When the CPU is saturated, more threads is definitely not what the server needs.
-	 */
-	public static ExecutorService newCoreThreadPool(String name, int coreSize, int maxSize, int idleTimeoutInSeconds) {
-		return newCoreThreadPool(daemonThreadFactory(name), coreSize, maxSize, idleTimeoutInSeconds);
-	}
-	public static ExecutorService newCoreThreadPool(ThreadFactory threadFactory, int coreSize, int maxSize, int idleTimeoutInSeconds) {
-		return new ThreadPoolExecutor(
-			coreSize,
-        	maxSize,
-        	idleTimeoutInSeconds, TimeUnit.SECONDS,
-			new SynchronousQueue<>(),
-			threadFactory,
-			new ThreadPoolExecutor.CallerRunsPolicy()
-        );
 	}
 
 }

@@ -25,16 +25,16 @@
 
 package jodd.mail;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class RFC2822AddressParserTest {
+class RFC2822AddressParserTest {
 
 	@Test
-	public void testEmailAddress() {
+	void testEmailAddress() {
 		RFC2822AddressParser.ParsedAddress address = new RFC2822AddressParser().parse("igor@jodd.org");
 
 		assertEquals(null, address.getPersonalName());
@@ -52,7 +52,7 @@ public class RFC2822AddressParserTest {
 	}
 
 	@Test
-	public void testValidEmails() {
+	void testValidEmails() {
 		assertTrue(new RFC2822AddressParser().parse("bob @example.com").isValid());
 		assertTrue(new RFC2822AddressParser().parse("\"bob\"  @  example.com").isValid());
 		assertTrue(new RFC2822AddressParser().parse("\"bob\" (hi) @  example.com").isValid());
@@ -76,7 +76,7 @@ public class RFC2822AddressParserTest {
 	}
 
 	@Test
-	public void testReturnPath() {
+	void testReturnPath() {
 		assertTrue(new RFC2822AddressParser().parse("\"[Kayaks]\" <kayaks@kayaks.org>").isValid());
 		assertFalse(new RFC2822AddressParser().parse("\"[Kayaks]\" <kayaks@kayaks.org>").isValidReturnPath());
 
@@ -85,7 +85,7 @@ public class RFC2822AddressParserTest {
 	}
 
 	@Test
-	public void testCommentAsName() {
+	void testCommentAsName() {
 		RFC2822AddressParser.ParsedAddress address = new RFC2822AddressParser().parse("<bob@example.com> (Bob Smith)");
 		assertEquals("Bob Smith", address.getPersonalName());
 
@@ -103,7 +103,7 @@ public class RFC2822AddressParserTest {
 	}
 
 	@Test
-	public void testValidEmails2() {
+	void testValidEmails2() {
 		assertTrue(new RFC2822AddressParser().parse("me@example.com").isValid());
 		assertTrue(new RFC2822AddressParser().parse("a.nonymous@example.com").isValid());
 		assertTrue(new RFC2822AddressParser().parse("name+tag@example.com").isValid());

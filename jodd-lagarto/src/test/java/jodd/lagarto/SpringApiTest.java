@@ -27,21 +27,21 @@ package jodd.lagarto;
 
 import jodd.io.FileUtil;
 import jodd.jerry.Jerry;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class SpringApiTest {
+class SpringApiTest {
 
 	protected String testDataRoot;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		if (testDataRoot != null) {
 			return;
 		}
@@ -50,7 +50,7 @@ public class SpringApiTest {
 	}
 
 	@Test
-	public void testPortletUtils() throws IOException {
+	void testPortletUtils() throws IOException {
 		File file = new File(testDataRoot, "PortletUtils.html");
 		String content = FileUtil.readString(file);
 
@@ -67,7 +67,7 @@ public class SpringApiTest {
 	}
 
 	@Test
-	public void testAbstractFormController() throws IOException {
+	void testAbstractFormController() throws IOException {
 		File file = new File(testDataRoot, "AbstractFormController.html");
 		String content = FileUtil.readString(file);
 

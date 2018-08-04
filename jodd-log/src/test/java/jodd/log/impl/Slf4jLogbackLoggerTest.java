@@ -27,17 +27,17 @@ package jodd.log.impl;
 
 import jodd.log.Logger;
 import jodd.log.LoggerFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class Slf4jLogbackLoggerTest {
+class Slf4jLogbackLoggerTest {
 
 	@Test
-	public void testLogger() {
+	void testLogger() {
 		PrintStream original = System.out;
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();

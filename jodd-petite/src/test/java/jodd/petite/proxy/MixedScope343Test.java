@@ -25,59 +25,62 @@
 
 package jodd.petite.proxy;
 
+import jodd.petite.AutomagicPetiteConfigurator;
 import jodd.petite.PetiteConfig;
 import jodd.petite.PetiteContainer;
-import jodd.petite.config.AutomagicPetiteConfigurator;
-import jodd.petite.proxy.example1.ExternalBean;
 import jodd.petite.proxetta.ProxettaAwarePetiteContainer;
+import jodd.petite.proxy.example1.ExternalBean;
+import jodd.proxetta.ProxettaNames;
 import jodd.proxetta.impl.ProxyProxetta;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import jodd.test.DisabledOnJava;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class MixedScope343Test {
+class MixedScope343Test {
 
 	private PetiteContainer petiteContainer;
 
-	@Before
-	public void setupPetiteContainer() {
-		PetiteConfig petiteConfig = PetiteHelper.createPetiteConfig();
+	@BeforeEach
+	void setupPetiteContainer() {
+		final PetiteConfig petiteConfig = PetiteHelper.createPetiteConfig();
 
-		ProxyProxetta proxyProxetta = PetiteHelper.createProxyProxetta();
+		final ProxyProxetta proxyProxetta = PetiteHelper.createProxyProxetta();
 		petiteContainer = new ProxettaAwarePetiteContainer(proxyProxetta, petiteConfig);
 
-		AutomagicPetiteConfigurator petiteConfigurator = new AutomagicPetiteConfigurator();
-		petiteConfigurator.setIncludedEntries(this.getClass().getPackage().getName() + ".*");
-		petiteConfigurator.configure(petiteContainer);
+		final AutomagicPetiteConfigurator petiteConfigurator = new AutomagicPetiteConfigurator(petiteContainer);
+		petiteConfigurator.withScanner(scanner -> scanner.includeEntries(this.getClass().getPackage().getName() + ".*"));
+		petiteConfigurator.configure();
 	}
 
-	@After
-	public void teardownPetiteContainer() {
+	@AfterEach
+	void teardownPetiteContainer() {
 		petiteContainer.shutdown();
 	}
 
 	private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 	private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
 
-	@Before
-	public void setUpStreams() {
+	@BeforeEach
+	void setUpStreams() {
 		System.setOut(new PrintStream(outContent));
 		System.setErr(new PrintStream(errContent));
 	}
 
-	@After
-	public void cleanUpStreams() {
+	@AfterEach
+	void cleanUpStreams() {
 		System.setOut(null);
 		System.setErr(null);
 	}
 
 	@Test
-	public void testWithMixingScopesSingletonAndProto(){
+	@DisabledOnJava(value = 9, description = "Automagic configuration only works with MR-JAR jars as they don't work in exploded mode.")
+	void testWithMixingScopesSingletonAndProto() {
 		ExternalBean externalBean = new ExternalBean();
 		// --> inject
 
@@ -87,13 +90,12 @@ public class MixedScope343Test {
 
 		System.out.println("RUN!");
 		externalBean.execute();
-
-		assertEquals("RUN!\n" +
-			"execute now : jodd.petite.proxy.example1.impl.MainPetiteBean\n" +
-			"execute now : jodd.petite.proxy.example1.impl.SubPetiteBean\n" +
-			"Executing jodd.petite.proxy.example1.impl.SubPetiteBean$$Proxetta\n" +
-			"executing jodd.petite.proxy.example1.impl.MainPetiteBean$$Proxetta\n" +
-			"executing non jodd petite bean -> jodd.petite.proxy.example1.ExternalBean\n",
+		assertEquals("RUN!" + System.lineSeparator() +
+			"execute now : jodd.petite.proxy.example1.impl.MainPetiteBean" + System.lineSeparator() +
+			"execute now : jodd.petite.proxy.example1.impl.SubPetiteBean" + System.lineSeparator() +
+			"Executing jodd.petite.proxy.example1.impl.SubPetiteBean" + ProxettaNames.proxyClassNameSuffix + System.lineSeparator() +
+			"executing jodd.petite.proxy.example1.impl.MainPetiteBean" + ProxettaNames.proxyClassNameSuffix + System.lineSeparator() +
+			"executing non jodd petite bean -> jodd.petite.proxy.example1.ExternalBean" + System.lineSeparator(),
 			outContent.toString());
 	}
 }

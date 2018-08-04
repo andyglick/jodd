@@ -26,14 +26,14 @@
 package jodd.json;
 
 import jodd.json.fixtures.model.Active;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class FieldsBooleanTest {
+class FieldsBooleanTest {
 
 	@Test
-	public void testBooleanField() {
+	void testBooleanField() {
 		Active active = new Active();
 
 		String json = JsonSerializer.create().serialize(active);

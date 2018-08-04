@@ -28,10 +28,11 @@ package jodd.mail;
 import com.sun.mail.pop3.POP3SSLStore;
 import jodd.util.StringPool;
 
-import javax.mail.NoSuchProviderException;
+import javax.mail.Authenticator;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
-import javax.mail.Store;
 import javax.mail.URLName;
+import java.io.File;
 import java.util.Properties;
 
 /**
@@ -39,42 +40,52 @@ import java.util.Properties;
  */
 public class Pop3SslServer extends Pop3Server {
 
-	protected static final String MAIL_POP3_SOCKET_FACTORY_PORT 	= "mail.pop3.socketFactory.port";
-	protected static final String MAIL_POP3_SOCKET_FACTORY_CLASS 	= "mail.pop3.socketFactory.class";
+	protected static final String MAIL_POP3_SOCKET_FACTORY_PORT = "mail.pop3.socketFactory.port";
+	protected static final String MAIL_POP3_SOCKET_FACTORY_CLASS = "mail.pop3.socketFactory.class";
 	protected static final String MAIL_POP3_SOCKET_FACTORY_FALLBACK = "mail.pop3.socketFactory.fallback";
 	protected static final int DEFAULT_SSL_PORT = 995;
 
-	protected final String username;
-	protected final String password;
-
-	public Pop3SslServer(String host, String username, String password) {
-		this(host, DEFAULT_SSL_PORT, username, password);
-	}
-
-	public Pop3SslServer(String host, int port, String username, String password) {
-		super(host, port, username, password);
-		this.username = username;
-		this.password = password;
+	public Pop3SslServer(final String host, final int port, final Authenticator authenticator, final File attachmentStorage) {
+		super(host, port == -1 ? DEFAULT_SSL_PORT : port, authenticator, attachmentStorage);
 	}
 
 	@Override
 	protected Properties createSessionProperties() {
-		Properties props = new Properties();
-		props.setProperty(MAIL_POP3_PORT, String.valueOf(port));
-		props.setProperty(MAIL_POP3_SOCKET_FACTORY_PORT, String.valueOf(port));
+		final Properties props = super.createSessionProperties();
+		props.setProperty(MAIL_POP3_SOCKET_FACTORY_PORT, String.valueOf(getPort()));
 		props.setProperty(MAIL_POP3_SOCKET_FACTORY_CLASS, "javax.net.ssl.SSLSocketFactory");
 		props.setProperty(MAIL_POP3_SOCKET_FACTORY_FALLBACK, StringPool.FALSE);
 		return props;
 	}
 
-	public Pop3SslServer setProperty(String name, String value) {
-		super.setProperty(name, value);
-		return this;
-	}
-
+	/**
+	 * Returns email store.
+	 *
+	 * @param session {@link Session}
+	 * @return {@link com.sun.mail.pop3.POP3SSLStore}
+	 */
 	@Override
-	protected Store getStore(Session session) throws NoSuchProviderException {
-		URLName url = new URLName(PROTOCOL_POP3, host, port, "", username, password);
+	protected POP3SSLStore getStore(final Session session) {
+		final SimpleAuthenticator simpleAuthenticator = (SimpleAuthenticator) getAuthenticator();
+		final URLName url;
+
+		if (simpleAuthenticator == null) {
+			url = new URLName(
+				PROTOCOL_POP3,
+				getHost(), getPort(),
+				StringPool.EMPTY,
+				null, null);
+		}
+		else {
+			final PasswordAuthentication pa = simpleAuthenticator.getPasswordAuthentication();
+			url = new URLName(
+				PROTOCOL_POP3,
+				getHost(), getPort(),
+				StringPool.EMPTY,
+				pa.getUserName(), pa.getPassword());
+		}
+
 		return new POP3SSLStore(session, url);
 	}
+
 }

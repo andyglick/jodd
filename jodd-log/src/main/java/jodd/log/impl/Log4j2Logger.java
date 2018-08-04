@@ -1,3 +1,27 @@
+// Copyright (c) 2003-present, Jodd Team (http://jodd.org)
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+// 1. Redistributions of source code must retain the above copyright notice,
+// this list of conditions and the following disclaimer.
+//
+// 2. Redistributions in binary form must reproduce the above copyright
+// notice, this list of conditions and the following disclaimer in the
+// documentation and/or other materials provided with the distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 package jodd.log.impl;
 
 import jodd.log.Logger;
@@ -18,7 +42,7 @@ public class Log4j2Logger implements Logger {
 	final org.apache.logging.log4j.Logger logger;
 	private final AbstractLogger abstractLogger;
 
-	public Log4j2Logger(org.apache.logging.log4j.Logger logger) {
+	public Log4j2Logger(final org.apache.logging.log4j.Logger logger) {
 		this.logger = logger;
 		if (logger instanceof AbstractLogger) {
 			abstractLogger = (AbstractLogger) logger;
@@ -31,7 +55,7 @@ public class Log4j2Logger implements Logger {
 	/**
 	 * Converts Jodd logging level to JDK.
 	 */
-	private org.apache.logging.log4j.Level jodd2log4j2(Logger.Level level) {
+	private org.apache.logging.log4j.Level jodd2log4j2(final Logger.Level level) {
 		switch (level) {
 			case TRACE: return org.apache.logging.log4j.Level.TRACE;
 			case DEBUG: return org.apache.logging.log4j.Level.DEBUG;
@@ -49,12 +73,12 @@ public class Log4j2Logger implements Logger {
 	}
 
 	@Override
-	public boolean isEnabled(Logger.Level level) {
+	public boolean isEnabled(final Logger.Level level) {
 		return logger.isEnabled(jodd2log4j2(level));
 	}
 
 	@Override
-	public void log(Logger.Level level, String message) {
+	public void log(final Logger.Level level, final String message) {
 		if (abstractLogger != null) {
 			abstractLogger.logIfEnabled(FQCN, jodd2log4j2(level), null, message);
 		}
@@ -63,7 +87,7 @@ public class Log4j2Logger implements Logger {
 		}
 	}
 	@Override
-	public void log(Logger.Level level, String message, Throwable throwable) {
+	public void log(final Logger.Level level, final String message, final Throwable throwable) {
 		if (abstractLogger != null) {
 			abstractLogger.logIfEnabled(FQCN, jodd2log4j2(level), null, message, throwable);
 		}
@@ -73,7 +97,7 @@ public class Log4j2Logger implements Logger {
 	}
 
 	@Override
-	public void setLevel(Logger.Level level) {
+	public void setLevel(final Logger.Level level) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -83,7 +107,7 @@ public class Log4j2Logger implements Logger {
 	}
 
 	@Override
-	public void trace(String message) {
+	public void trace(final String message) {
 		if (abstractLogger != null) {
 			abstractLogger.logIfEnabled(FQCN, org.apache.logging.log4j.Level.TRACE, null, message);
 		}
@@ -98,7 +122,7 @@ public class Log4j2Logger implements Logger {
 	}
 
 	@Override
-	public void debug(String message) {
+	public void debug(final String message) {
 		if (abstractLogger != null) {
 			abstractLogger.logIfEnabled(FQCN, org.apache.logging.log4j.Level.DEBUG, null, message);
 		}
@@ -113,7 +137,7 @@ public class Log4j2Logger implements Logger {
 	}
 
 	@Override
-	public void info(String message) {
+	public void info(final String message) {
 		if (abstractLogger != null) {
 			abstractLogger.logIfEnabled(FQCN, org.apache.logging.log4j.Level.INFO, null, message);
 		}
@@ -128,7 +152,7 @@ public class Log4j2Logger implements Logger {
 	}
 
 	@Override
-	public void warn(String message) {
+	public void warn(final String message) {
 		if (abstractLogger != null) {
 			abstractLogger.logIfEnabled(FQCN, org.apache.logging.log4j.Level.WARN, null, message);
 		}
@@ -138,7 +162,7 @@ public class Log4j2Logger implements Logger {
 	}
 
 	@Override
-	public void warn(String message, Throwable throwable) {
+	public void warn(final String message, final Throwable throwable) {
 		if (abstractLogger != null) {
 			abstractLogger.logIfEnabled(FQCN, org.apache.logging.log4j.Level.WARN, null, message, throwable);
 		}
@@ -153,7 +177,7 @@ public class Log4j2Logger implements Logger {
 	}
 
 	@Override
-	public void error(String message) {
+	public void error(final String message) {
 		if (abstractLogger != null) {
 			abstractLogger.logIfEnabled(FQCN, org.apache.logging.log4j.Level.ERROR, null, message);
 		}
@@ -163,7 +187,7 @@ public class Log4j2Logger implements Logger {
 	}
 
 	@Override
-	public void error(String message, Throwable throwable) {
+	public void error(final String message, final Throwable throwable) {
 		if (abstractLogger != null) {
 			abstractLogger.logIfEnabled(FQCN, org.apache.logging.log4j.Level.ERROR, null, message, throwable);
 		}

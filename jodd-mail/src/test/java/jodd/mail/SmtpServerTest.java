@@ -25,41 +25,56 @@
 
 package jodd.mail;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Properties;
 
 import static jodd.mail.SmtpServer.MAIL_SMTP_FROM;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class SmtpServerTest {
+class SmtpServerTest {
 
-    @Test
-    public void testAddsPropertyToServerSession() {
-        Properties overridenProperties = new Properties();
+	private static final String SOME_HOST_COM = "some.host.com";
+	private static final int PORT = 587;
+	private static final String FROM = "bounce@jodd.org";
+	private static final String USERNAME = "test";
+	private static final String PASSWORD = "password";
 
-        overridenProperties.setProperty("mail.smtp.from", "bounce@jodd.org");
+	@Test
+	void testAddsPropertyToServerSession() {
+		final Properties overridenProperties = new Properties();
 
-        SmtpServer smtpServer = SmtpServer.create("some.host.com", 587)
-                .authenticateWith("test", "password")
-                .timeout(10)
-                .properties(overridenProperties);
+		overridenProperties.setProperty(MAIL_SMTP_FROM, FROM);
 
-        Properties sessionProperties = smtpServer.createSession().mailSession.getProperties();
+		final SmtpServer smtpServer = MailServer.create()
+			.host(SOME_HOST_COM)
+			.port(PORT)
+			.auth(USERNAME, PASSWORD)
+			.buildSmtpMailServer()
+			.timeout(10);
 
-        assertThat(sessionProperties.getProperty("mail.smtp.from"), is("bounce@jodd.org"));
-    }
+		smtpServer.getSessionProperties().putAll(overridenProperties);
 
-    @Test
-    public void testAddsPropertyToServerSession2() {
-        SmtpSslServer smtpServer = SmtpSslServer.create("some.host.com", 587)
-                .authenticateWith("test", "password")
-                .timeout(10)
-                .property(MAIL_SMTP_FROM, "bounce@jodd.org");
+		assertFrom(smtpServer);
+	}
 
-        Properties sessionProperties = smtpServer.createSession().mailSession.getProperties();
+	@Test
+	void testAddsPropertyToServerSession2() {
+		final SmtpServer smtpServer = MailServer.create()
+			.host(SOME_HOST_COM)
+			.port(PORT)
+			.auth(USERNAME, PASSWORD)
+			.ssl(true)
+			.buildSmtpMailServer()
+			.timeout(10);
 
-        assertThat(sessionProperties.getProperty("mail.smtp.from"), is("bounce@jodd.org"));
-    }
+		smtpServer.getSessionProperties().setProperty(MAIL_SMTP_FROM, FROM);
+
+		assertFrom(smtpServer);
+	}
+
+	private void assertFrom(final MailServer server) {
+		final Properties sessionProperties = server.createSession().getSession().getProperties();
+		assertEquals(FROM, sessionProperties.getProperty(MAIL_SMTP_FROM));
+	}
 }
